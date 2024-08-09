@@ -3,7 +3,12 @@ from fastapi.responses import JSONResponse
 from routes import admin, user, project
 from utils.auth import authenticate_token
 
-app = FastAPI()
+app = FastAPI(title="My App",
+    description="Description of my app.",
+    version="1.0",
+    docs_url='/docs',
+    openapi_url='/openapi.json', # This line solved my issue, in my case it was a lambda function
+    redoc_url=None)
 app.include_router(admin.admin_router)
 app.include_router(user.user_router)
 app.include_router(project.project_router)
@@ -16,7 +21,7 @@ async def authenticateUser(request: Request, call_next):
     urlpath = request.url.path
     verb = request.method
     print(verb, urlpath)
-    if urlpath == "/user/login" or urlpath == "/docs" or urlpath=="/":
+    if urlpath == "/user/login" or urlpath == "/docs" or urlpath=="/" or urlpath == '/openapi.json':
         response = await call_next(request)
         return response
     elif urlpath == "/user/" and verb == "POST":
