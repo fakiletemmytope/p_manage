@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from .routes import admin, user, project
-from .utils.auth import authenticate_token
+from routes import admin, user, project
+from utils.auth import authenticate_token
 
 app = FastAPI()
 app.include_router(admin.admin_router)

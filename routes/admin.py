@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Form
 from fastapi.responses import JSONResponse
 from pydantic import EmailStr, BaseModel
-from ..utils import templates, serializer, auth
-from ..database.db_connect import Session
-from ..models.model import User
+from utils import templates, serializer, auth
+from database.db_connect import Session
+from models.model import User
 from typing import Annotated
 from sqlalchemy.exc import SQLAlchemyError
 

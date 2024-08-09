@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Date, Enum, Table
 from sqlalchemy.orm import relationship
-from ..database.db_connect import Base, engine, Session
+from database.db_connect import Base, engine, Session
 from enum import Enum as PyEnum
 
 class Status(PyEnum):
