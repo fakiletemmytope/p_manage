@@ -7,6 +7,6 @@ services:
   plan: free
   region: oregon
   buildCommand: pip install -r requirements.txt
-  startCommand: gunicorn your_application.wsgi
+  startCommand: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
   pullRequestPreviewsEnabled: true
 version: "1"
