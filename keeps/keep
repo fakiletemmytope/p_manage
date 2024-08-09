@@ -1,0 +1,195 @@
+Sure, I can help with that! Let’s start by designing an Entity-Relationship Diagram (ERD) and then outline the key tables based on the requirements for a project management API. 
+
+### **Entities and Relationships**
+
+Here are the main entities for a project management system:
+
+1. **User**
+   - Represents people who interact with the system.
+   
+2. **Project**
+   - Represents individual projects.
+
+3. **Task**
+   - Represents tasks within projects.
+
+4. **Assignment**
+   - Represents which user is assigned to which task.
+
+5. **Progress**
+   - Tracks the progress of tasks.
+
+6. **Role**
+   - Represents different roles users can have (Admin, User, Guest).
+
+### **ERD Diagram**
+
+Here’s a basic textual representation of the ERD:
+
+1. **User** 
+   - UserID (PK)
+   - Username
+   - Password (hashed)
+   - Email
+   - RoleID (FK)
+
+2. **Role**
+   - RoleID (PK)
+   - RoleName (Admin, User, Guest)
+
+3. **Project**
+   - ProjectID (PK)
+   - ProjectName
+   - Description
+   - StartDate
+   - EndDate
+   - CreatedBy (FK to UserID)
+
+4. **Task**
+   - TaskID (PK)
+   - TaskName
+   - Description
+   - DueDate
+   - Status
+   - ProjectID (FK)
+   - CreatedBy (FK to UserID)
+
+5. **Assignment**
+   - AssignmentID (PK)
+   - TaskID (FK)
+   - UserID (FK)
+   - AssignedDate
+
+6. **Progress**
+   - ProgressID (PK)
+   - TaskID (FK)
+   - UserID (FK)
+   - ProgressDate
+   - ProgressDescription
+
+### **Tables**
+
+Here are the tables and their columns based on the above entities:
+
+1. **User Table**
+   ```sql
+   CREATE TABLE User (
+       UserID INT PRIMARY KEY AUTO_INCREMENT,
+       Username VARCHAR(50) NOT NULL UNIQUE,
+       Password VARCHAR(255) NOT NULL,
+       Email VARCHAR(100) NOT NULL UNIQUE,
+       RoleID INT,
+       FOREIGN KEY (RoleID) REFERENCES Role(RoleID)
+   );
+   ```
+
+2. **Role Table**
+   ```sql
+   CREATE TABLE Role (
+       RoleID INT PRIMARY KEY AUTO_INCREMENT,
+       RoleName ENUM('Admin', 'User', 'Guest') NOT NULL
+   );
+   ```
+
+3. **Project Table**
+   ```sql
+   CREATE TABLE Project (
+       ProjectID INT PRIMARY KEY AUTO_INCREMENT,
+       ProjectName VARCHAR(100) NOT NULL,
+       Description TEXT,
+       StartDate DATE,
+       EndDate DATE,
+       CreatedBy INT,
+       FOREIGN KEY (CreatedBy) REFERENCES User(UserID)
+   );
+   ```
+
+4. **Task Table**
+   ```sql
+   CREATE TABLE Task (
+       TaskID INT PRIMARY KEY AUTO_INCREMENT,
+       TaskName VARCHAR(100) NOT NULL,
+       Description TEXT,
+       DueDate DATE,
+       Status ENUM('Not Started', 'In Progress', 'Completed') NOT NULL,
+       ProjectID INT,
+       CreatedBy INT,
+       FOREIGN KEY (ProjectID) REFERENCES Project(ProjectID),
+       FOREIGN KEY (CreatedBy) REFERENCES User(UserID)
+   );
+   ```
+
+5. **Assignment Table**
+   ```sql
+   CREATE TABLE Assignment (
+       AssignmentID INT PRIMARY KEY AUTO_INCREMENT,
+       TaskID INT,
+       UserID INT,
+       AssignedDate DATE,
+       FOREIGN KEY (TaskID) REFERENCES Task(TaskID),
+       FOREIGN KEY (UserID) REFERENCES User(UserID)
+   );
+   ```
+
+6. **Progress Table**
+   ```sql
+   CREATE TABLE Progress (
+       ProgressID INT PRIMARY KEY AUTO_INCREMENT,
+       TaskID INT,
+       UserID INT,
+       ProgressDate DATE,
+       ProgressDescription TEXT,
+       FOREIGN KEY (TaskID) REFERENCES Task(TaskID),
+       FOREIGN KEY (UserID) REFERENCES User(UserID)
+   );
+   ```
+
+### **Documentation**
+
+For each user level, here’s an outline of the documentation you might provide:
+
+#### **1. Admin**
+- **Capabilities:**
+  - Manage users (create, update, delete).
+  - Create and manage projects.
+  - Create and manage tasks.
+  - Assign tasks to users.
+  - View and edit progress reports.
+  - Generate and view reports.
+  
+- **API Endpoints:**
+  - `/admin/users` - Create, read, update, delete users.
+  - `/admin/projects` - Create, read, update, delete projects.
+  - `/admin/tasks` - Create, read, update, delete tasks.
+  - `/admin/assignments` - Assign tasks to users.
+  - `/admin/progress` - View and edit progress.
+
+- **Permissions:**
+  - Full access to all resources and functionalities.
+
+#### **2. User**
+- **Capabilities:**
+  - View assigned projects and tasks.
+  - Update progress on tasks.
+  - View personal progress reports.
+
+- **API Endpoints:**
+  - `/user/projects` - View assigned projects.
+  - `/user/tasks` - View and update assigned tasks.
+  - `/user/progress` - Update and view personal progress.
+
+- **Permissions:**
+  - Access to own tasks and progress only.
+
+#### **3. Guest**
+- **Capabilities:**
+  - View publicly available project and task information.
+  
+- **API Endpoints:**
+  - `/guest/projects` - View project details.
+  - `/guest/tasks` - View task details.
+
+- **Permissions:**
+  - Read-only access to non-sensitive information.
+
+This structure should provide a solid foundation for building and documenting your project management API. If you need more specific details or further adjustments, let me know!
