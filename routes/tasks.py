@@ -9,6 +9,6 @@ from datetime import date
 from sqlalchemy.exc import SQLAlchemyError
 
 project_router = APIRouter(
-    prefix="/project", 
+    prefix="/tasks", 
     tags=["Tasks Routes"]
 )

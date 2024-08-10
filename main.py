@@ -3,11 +3,10 @@ from fastapi.responses import JSONResponse
 from routes import admin, user, project
 from utils.auth import authenticate_token
 
-app = FastAPI(title="My App",
-    description="Description of my app.",
+app = FastAPI(title="Project Management",
     version="1.0",
     docs_url='/docs',
-    openapi_url='/openapi.json', # This line solved my issue, in my case it was a lambda function
+    openapi_url='/openapi.json', 
     redoc_url=None)
 app.include_router(admin.admin_router)
 app.include_router(user.user_router)
@@ -52,5 +51,6 @@ async def authenticateUser(request: Request, call_next):
 
 @app.get("/")
 def root():
-    return {"message":"welcome to the Project Management hub"}
+    return {"message":"welcome to the Project Management hub",
+            "info": "the link to the documentation is: https://p-manage.onrender.com/docs"}
 
