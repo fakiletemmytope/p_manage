@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Form, Request
 from fastapi.responses import JSONResponse
 from pydantic import EmailStr, BaseModel
 from utils import templates, serializer, auth
@@ -8,7 +8,8 @@ from typing import Annotated
 from sqlalchemy.exc import SQLAlchemyError
 
 admin_router = APIRouter(
-    prefix="/admin"
+    prefix="/admin",
+    tags=["admin routes"]
 )
 
 class User(BaseModel):
@@ -18,12 +19,15 @@ class User(BaseModel):
     password: str
     is_admin: bool = False
 
-
 #user Routes for admin
 @admin_router.get("/user/{user_id}")
-def get_user(user_id: int):
+def get_user(user_id: int, request: Request):
+    if request.state.custom_data["current_userRole"] == "not_admin":
+        return JSONResponse(content={
+            'message': 'Unauthorised User'
+        })
     session = Session()
-    result = session.query(User).filter(User.id == user_id).one()
+    # result = session.query(User).filter(User.id == user_id).one()
     try:
         result = session.query(User).filter(User.id == user_id).one()
         session.close()
@@ -41,7 +45,11 @@ def get_user(user_id: int):
     
     
 @admin_router.get("/user")
-def get_users():
+def get_users(request: Request):
+    if request.state.custom_data["current_userRole"] == "not_admin":
+        return JSONResponse(content={
+            'message': 'Unauthorised User'
+        })
     session = Session()
     users = []
     try:
@@ -66,7 +74,7 @@ def get_users():
         }) 
 
 @admin_router.post("/user")
-def create_user(first_name: Annotated[str, Form()], last_name: Annotated[str, Form()], 
+def create_user(request: Request,first_name: Annotated[str, Form()], last_name: Annotated[str, Form()], 
                 email: Annotated[EmailStr, Form()], password:Annotated[str, Form()],
                 is_admin:Annotated[bool, Form()]=False):
     hashed_password = auth.hash_password(password)
@@ -77,6 +85,10 @@ def create_user(first_name: Annotated[str, Form()], last_name: Annotated[str, Fo
         hashed_password = hashed_password,
         is_admin = is_admin
     )
+    if request.state.custom_data["current_userRole"] == "not_admin":
+        return JSONResponse(content={
+            'message': 'Unauthorised User'
+        })
     try:
         session=Session()
         session.add(new_user)
@@ -96,8 +108,12 @@ def create_user(first_name: Annotated[str, Form()], last_name: Annotated[str, Fo
 
 
 @admin_router.put("/user/{user_id}")
-def update_user(user_id: int, first_name: Annotated[str, Form()], last_name: Annotated[str, Form()],
+def update_user(request: Request, user_id: int, first_name: Annotated[str, Form()], last_name: Annotated[str, Form()],
                 is_admin:Annotated[bool, Form()]):
+    if request.state.custom_data["current_userRole"] == "not_admin":
+        return JSONResponse(content={
+            'message': 'Unauthorised User'
+        })
     try:
         session = Session()
         result = session.query(User).filter(User.id == user_id).one()
@@ -127,7 +143,11 @@ def update_user(user_id: int, first_name: Annotated[str, Form()], last_name: Ann
 
 
 @admin_router.delete("/user/{user_id}")
-def delete_user(user_id: int):
+def delete_user(request: Request, user_id: int):
+    if request.state.custom_data["current_userRole"] == "not_admin":
+        return JSONResponse(content={
+            'message': 'Unauthorised User'
+        })
     try:
         session = Session()
         result = session.query(User).filter(User.id==user_id).one()

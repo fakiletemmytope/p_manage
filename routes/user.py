@@ -9,7 +9,8 @@ from datetime import date
 from sqlalchemy.exc import SQLAlchemyError
 
 user_router = APIRouter(
-    prefix="/user"
+    prefix="/user",
+    tags=["Users Routes"]
 )
 
 
